@@ -1,0 +1,2 @@
+# OpenMiamMiamUserBundle
+OpenMiamMiam User Bundle
