@@ -12,7 +12,7 @@
     }
   ],
   "require": {
-    "isics/openmiammiam-bundle": "dev-master"
+    "friendsofsymfony/user-bundle": "~2.0@dev"
   },
   "autoload": {
     "psr-4": { "Isics\\Bundle\\OpenMiamMiamUserBundle\\": "" }
