@@ -1,0 +1,20 @@
+{
+  "name": "isics/openmiammiam-user-bundle",
+  "type": "openmiammiam-user-bundle",
+  "description": "OpenMiamMiam User Bundle",
+  "keywords": [],
+  "homepage": "https://github.com/isics/OpenMiamMiam",
+  "license": "AGPL-3.0",
+  "authors": [
+    {
+      "name": "Isics",
+      "homepage": "http://www.isics.fr"
+    }
+  ],
+  "require": {
+    "isics/openmiammiam-bundle": "dev-master"
+  },
+  "autoload": {
+    "psr-4": { "Isics\\Bundle\\OpenMiamMiamUserBundle\\": "" }
+  }
+}
