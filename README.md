@@ -1,2 +1,2 @@
 # OpenMiamMiamUserBundle
-[READ-ONLY] Subtree split of the OpenMiamMiamUser Bundle https://github.com/isics/OpenMiamMiam
+OpenMiamMiamUserBundle is a part of OpenMiamMiam platform: https://github.com/isics/OpenMiamMiam
