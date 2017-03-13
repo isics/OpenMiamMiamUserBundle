@@ -12,7 +12,5 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
 {% block content %}
-    <p>
-        {{ 'resetting.check_email'|trans({'%email%': email}) }}
-    </p>
-{% endblock %}
+    <div class="alert alert-success">{{ 'resetting.check_email'|trans({'%email%': email}) }}</div>
+{% endblock content %}
