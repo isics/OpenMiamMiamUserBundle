@@ -11,6 +11,9 @@
       "homepage": "http://www.isics.fr"
     }
   ],
+  "require": {
+    "hwi/oauth-bundle": "^0.5.3"
+  },
   "autoload": {
     "psr-4": { "Isics\\Bundle\\OpenMiamMiamUserBundle\\": "" }
   }
