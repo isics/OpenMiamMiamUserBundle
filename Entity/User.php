@@ -139,27 +139,6 @@ class User extends BaseUser
     private $writtenComments;
 
     /**
-     * @ORM\Column(name="facebook_id", type="string", length=255, nullable=true)
-     *
-     * @var int
-     */
-    private $facebookId;
-
-    /**
-     * @ORM\Column(name="facebook_access_token", type="string", length=255, nullable=true)
-     *
-     * @var string
-     */
-    private $facebookAccessToken;
-
-    /**
-     * @ORM\Column(name="facebook_refresh_token", type="string", length=255, nullable=true)
-     *
-     * @var string
-     */
-    private $facebookRefreshToken;
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -593,53 +572,5 @@ class User extends BaseUser
     public function getWrittenComments()
     {
         return $this->writtenComments;
-    }
-
-    /**
-     * @param string $facebookAccessToken
-     */
-    public function setFacebookAccessToken($facebookAccessToken)
-    {
-        $this->facebookAccessToken = $facebookAccessToken;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFacebookAccessToken()
-    {
-        return $this->facebookAccessToken;
-    }
-
-    /**
-     * @param int $facebookId
-     */
-    public function setFacebookId($facebookId)
-    {
-        $this->facebookId = $facebookId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFacebookId()
-    {
-        return $this->facebookId;
-    }
-
-    /**
-     * @param string $facebookRefreshToken
-     */
-    public function setFacebookRefreshToken($facebookRefreshToken)
-    {
-        $this->facebookRefreshToken = $facebookRefreshToken;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFacebookRefreshToken()
-    {
-        return $this->facebookRefreshToken;
     }
 }
