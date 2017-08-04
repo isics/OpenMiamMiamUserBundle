@@ -40,6 +40,11 @@ class ProfileEditingListener implements EventSubscriberInterface
 
     public function onSuccess(FormEvent $event)
     {
-        $event->setResponse(new RedirectResponse($this->router->generate('open_miam_miam.homepage')));
+        $redirectUrl = $event->getRequest()->query->get('redirectUrl');
+        if ($redirectUrl !== null) {
+            $event->setResponse(new RedirectResponse($redirectUrl));
+        } else {
+            $event->setResponse(new RedirectResponse($this->router->generate('open_miam_miam.homepage')));
+        }
     }
 }
