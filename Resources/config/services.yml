@@ -29,6 +29,17 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    open_miam_miam_user.listener.full_profile:
+        class: Isics\Bundle\OpenMiamMiamUserBundle\EventListener\ProfileCompletionListener
+        arguments:
+            - '@security.token_storage'
+            - '@validator'
+            - '@session'
+            - '@translator'
+            - '@router'
+        tags:
+            - { name: kernel.event_subscriber }
+
     open_miam_miam_user.manager.user:
         class: %open_miam_miam_user.manager.user.class%
         arguments:
