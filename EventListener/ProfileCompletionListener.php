@@ -142,7 +142,11 @@ class ProfileCompletionListener implements EventSubscriberInterface
                 );
             }
 
-            $event->setResponse(new RedirectResponse($this->router->generate('fos_user_profile_edit')));
+            $event->setResponse(new RedirectResponse(
+                $this->router->generate('fos_user_profile_edit', array(
+                    'redirectUrl' => $event->getRequest()->getUri()
+                ))
+            ));
         }
     }
 }
