@@ -121,7 +121,7 @@ class ProfileCompletionListener implements EventSubscriberInterface
         /** @var User $user */
         $user = $this->tokenStorage->getToken()->getUser();
 
-        $violationsList = $this->validator->validate($user, null, array('Default', 'Registration'));
+        $violationsList = $this->validator->validate($user, null, array('Default', 'Profile'));
 
         if (count($violationsList) > 0) {
             $indexedViolationsList = array();
@@ -138,7 +138,7 @@ class ProfileCompletionListener implements EventSubscriberInterface
             ) {
                 $this->session->getFlashBag()->add(
                     'warning',
-                    $this->translator->trans('turlututu')
+                    $this->translator->trans('profile.missing.address')
                 );
             }
 
