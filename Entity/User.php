@@ -141,7 +141,7 @@ class User extends BaseUser
     /**
      * @ORM\Column(name="facebook_id", type="string", length=255, nullable=true)
      *
-     * @var int
+     * @var string
      */
     private $facebookId;
 
@@ -612,7 +612,7 @@ class User extends BaseUser
     }
 
     /**
-     * @param int $facebookId
+     * @param string $facebookId
      */
     public function setFacebookId($facebookId)
     {
@@ -620,7 +620,7 @@ class User extends BaseUser
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getFacebookId()
     {
