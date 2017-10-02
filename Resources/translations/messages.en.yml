@@ -68,4 +68,4 @@ user.orders.no_order:   "No sales order"
 pdf.user.sales_order.filename: "%ref%.pdf"
 
 # Profile validation
-profile.missing.address: "Please fill your address to complete your profile"
+profile.missing.address: "Please fill your address to complete your registration"
