@@ -43,7 +43,7 @@ class User extends BaseUser
     /**
      * @var string $address1
      *
-     * @ORM\Column(name="address1", type="string", length=64, nullable=false)
+     * @ORM\Column(name="address1", type="string", length=64, nullable=true)
      * @Expose
      */
     private $address1;
@@ -59,7 +59,7 @@ class User extends BaseUser
     /**
      * @var string $zipcode
      *
-     * @ORM\Column(name="zipcode", type="string", length=8, nullable=false)
+     * @ORM\Column(name="zipcode", type="string", length=8, nullable=true)
      * @Expose
      */
     private $zipcode;
@@ -67,7 +67,7 @@ class User extends BaseUser
     /**
      * @var string $city
      *
-     * @ORM\Column(name="city", type="string", length=64, nullable=false)
+     * @ORM\Column(name="city", type="string", length=64, nullable=true)
      * @Expose
      */
     private $city;
@@ -137,6 +137,27 @@ class User extends BaseUser
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Comment", mappedBy="writer")
      */
     private $writtenComments;
+
+    /**
+     * @ORM\Column(name="facebook_id", type="string", length=255, nullable=true)
+     *
+     * @var string
+     */
+    private $facebookId;
+
+    /**
+     * @ORM\Column(name="facebook_access_token", type="string", length=255, nullable=true)
+     *
+     * @var string
+     */
+    private $facebookAccessToken;
+
+    /**
+     * @ORM\Column(name="facebook_refresh_token", type="string", length=255, nullable=true)
+     *
+     * @var string
+     */
+    private $facebookRefreshToken;
 
     /**
      * Constructor
@@ -572,5 +593,53 @@ class User extends BaseUser
     public function getWrittenComments()
     {
         return $this->writtenComments;
+    }
+
+    /**
+     * @param string $facebookAccessToken
+     */
+    public function setFacebookAccessToken($facebookAccessToken)
+    {
+        $this->facebookAccessToken = $facebookAccessToken;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFacebookAccessToken()
+    {
+        return $this->facebookAccessToken;
+    }
+
+    /**
+     * @param string $facebookId
+     */
+    public function setFacebookId($facebookId)
+    {
+        $this->facebookId = $facebookId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFacebookId()
+    {
+        return $this->facebookId;
+    }
+
+    /**
+     * @param string $facebookRefreshToken
+     */
+    public function setFacebookRefreshToken($facebookRefreshToken)
+    {
+        $this->facebookRefreshToken = $facebookRefreshToken;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFacebookRefreshToken()
+    {
+        return $this->facebookRefreshToken;
     }
 }
