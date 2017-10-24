@@ -97,7 +97,7 @@ class User extends BaseUser
     /**
      * @var boolean $isOrdersOpenNotificationSubscriber
      *
-     * @ORM\Column(name="is_orders_open_notification_subscriber", type="boolean", nullable=false, options={"default":1})
+     * @ORM\Column(name="is_orders_open_notification_subscriber", type="boolean", nullable=false, options={"default":0})
      * @Expose
      */
     private $isOrdersOpenNotificationSubscriber;
@@ -105,7 +105,7 @@ class User extends BaseUser
     /**
      * @var boolean $isNewsletterSubscriber
      *
-     * @ORM\Column(name="is_newsletter_subscriber", type="boolean", nullable=false, options={"default":1})
+     * @ORM\Column(name="is_newsletter_subscriber", type="boolean", nullable=false, options={"default":0})
      * @Expose
      */
     private $isNewsletterSubscriber;
@@ -166,8 +166,8 @@ class User extends BaseUser
     {
         parent::__construct();
 
-        $this->isOrdersOpenNotificationSubscriber = true;
-        $this->isNewsletterSubscriber = true;
+        $this->isOrdersOpenNotificationSubscriber = false;
+        $this->isNewsletterSubscriber = false;
     }
 
     /**
