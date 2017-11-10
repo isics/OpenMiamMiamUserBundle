@@ -13,6 +13,7 @@ namespace Isics\Bundle\OpenMiamMiamUserBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Association;
+use Isics\Bundle\OpenMiamMiamBundle\Entity\BranchOccurrence;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Producer;
 use Isics\Bundle\OpenMiamMiamUserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -319,5 +320,21 @@ class UserManager
         }
 
         $this->aclProvider->updateAcl($acl);
+    }
+
+    /**
+     * Returns User that are consumer of branch occurrence's branch, but haven't ordered for branch occurrence yet
+     *
+     * @param BranchOccurrence $branchOccurrence
+     *
+     * @return User[]
+     */
+    public function findConsumerWithoutOrderForBranchOccurrence(BranchOccurrence $branchOccurrence)
+    {
+        return $this->entityManager->getRepository('IsicsOpenMiamMiamUserBundle:User')
+            ->findConsumerWithoutOrderForBranchOccurrence(
+                $branchOccurrence,
+                $this->lastOrderNbDaysConsideringCustomer
+            );
     }
 }
