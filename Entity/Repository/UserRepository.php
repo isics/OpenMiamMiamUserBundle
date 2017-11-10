@@ -18,9 +18,10 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Association;
+use Isics\Bundle\OpenMiamMiamBundle\Entity\Branch;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\BranchOccurrence;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Producer;
-use Isics\Bundle\OpenMiamMiamBundle\Model\Admin\UserFilter;
+use Isics\Bundle\OpenMiamMiamUserBundle\Entity\User;
 
 class UserRepository extends EntityRepository
 {
@@ -353,18 +354,28 @@ QUERY;
     /**
      * Returns query builder to find consumers of branches
      *
-     * @param \Doctrine\Common\Collections\Collection $branches
-     * @param int                                     $lastOrderNbDaysConsideringCustomer
+     * @param Branch[]|Branch $branches
+     * @param int             $lastOrderNbDaysConsideringCustomer
+     *
+     * @throws \InvalidArgumentException
      *
      * @return QueryBuilder
      */
     public function getConsumersForBranchesQueryBuilder($branches, $lastOrderNbDaysConsideringCustomer = null)
     {
+        if (!is_array($branches) && !$branches instanceof \Traversable) {
+            $branches = array($branches);
+        }
+
         $qb = $this->createQueryBuilder('u')
             ->where('u.locked = 0');
 
         $branchesIds = array();
         foreach ($branches as $branch) {
+            if (!$branch instanceof Branch) {
+                throw new \InvalidArgumentException('$branches parameter must be a Branch instance or a Branch collection (array or iterable)');
+            }
+
             $branchesIds[] = $branch->getId();
         }
 
@@ -559,5 +570,29 @@ QUERY;
         }
 
         return $qb;
+    }
+
+    /**
+     * Returns User that are consumer of branch occurrence's branch, but haven't ordered for branch occurrence yet
+     *
+     * @param BranchOccurrence $branchOccurrence
+     * @param int             $lastOrderNbDaysConsideringCustomer
+     *
+     * @return User[]
+     */
+    public function findConsumerWithoutOrderForBranchOccurrence(BranchOccurrence $branchOccurrence, $lastOrderNbDaysConsideringCustomer = null)
+    {
+        $qb = $this->getConsumersForBranchesQueryBuilder(
+            array($branchOccurrence->getBranch()),
+            $lastOrderNbDaysConsideringCustomer
+        );
+
+        return $qb
+            ->leftJoin('u.salesOrders', 'so2', 'WITH', 'so2.branchOccurrence = :branch_occurrence')
+            ->andWhere('u.isOrdersOpenNotificationSubscriber = true')
+            ->andWhere($qb->expr()->isNull('so2'))
+            ->setParameter('branch_occurrence', $branchOccurrence)
+            ->getQuery()
+            ->getResult();
     }
 }
