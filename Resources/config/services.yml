@@ -45,6 +45,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - %open_miam_miam_user.last_order_nb_days_considering_customer%
+            - %open_miam_miam_user.nb_days_without_relaunch%
             - '@security.acl.provider'
 
     # Repositories

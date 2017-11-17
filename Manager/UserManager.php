@@ -18,7 +18,7 @@ use Isics\Bundle\OpenMiamMiamBundle\Entity\Producer;
 use Isics\Bundle\OpenMiamMiamUserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
-use Symfony\Component\Security\Acl\Exception\Acl\AclNotFoundException;
+use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 
@@ -39,6 +39,13 @@ class UserManager
     private $lastOrderNbDaysConsideringCustomer;
 
     /**
+     * Number of days after last relaunch we don't relaunch a user without orders
+     *
+     * @var int
+     */
+    private $nbDaysWithoutRelaunch;
+
+    /**
      * Acl provider
      *
      * @var AclProviderInterface $aclProvider
@@ -50,13 +57,18 @@ class UserManager
      *
      * @param EntityManager        $entityManager
      * @param int                  $lastOrderNbDaysConsideringCustomer
+     * @param int                  $nbDaysWithoutRelaunch
      * @param AclProviderInterface $aclProvider
      */
-    public function __construct(EntityManager $entityManager, $lastOrderNbDaysConsideringCustomer, AclProviderInterface $aclProvider)
+    public function __construct(EntityManager $entityManager,
+                                $lastOrderNbDaysConsideringCustomer,
+                                $nbDaysWithoutRelaunch,
+                                AclProviderInterface $aclProvider)
     {
-        $this->entityManager = $entityManager;
+        $this->entityManager                      = $entityManager;
         $this->lastOrderNbDaysConsideringCustomer = $lastOrderNbDaysConsideringCustomer;
-        $this->aclProvider = $aclProvider;
+        $this->nbDaysWithoutRelaunch              = $nbDaysWithoutRelaunch;
+        $this->aclProvider                        = $aclProvider;
     }
 
     /**
@@ -81,8 +93,13 @@ class UserManager
      */
     public function findOrdersOpenNotificationSubscribersForBranches($branches)
     {
-        return $this->entityManager->getRepository('IsicsOpenMiamMiamUserBundle:User')
+        $consumers = $this->entityManager->getRepository('IsicsOpenMiamMiamUserBundle:User')
             ->findOrdersOpenNotificationSubscribersForBranches($branches, $this->lastOrderNbDaysConsideringCustomer);
+
+        $associatedUsers = $this->entityManager->getRepository('IsicsOpenMiamMiamUserBundle:User')
+            ->findAssociatedUsersForBranches($branches, $this->nbDaysWithoutRelaunch);
+
+        return array_unique(array_merge($consumers, $associatedUsers));
     }
 
     /**
@@ -139,15 +156,15 @@ class UserManager
         }
 
         $objectIdentity = ObjectIdentity::fromDomainObject($object);
-        $acl = $this->aclProvider->findAcl($objectIdentity);
-        $objectAces = $acl->getObjectAces();
+        $acl            = $this->aclProvider->findAcl($objectIdentity);
+        $objectAces     = $acl->getObjectAces();
 
         $managers = $this->entityManager->getRepository('IsicsOpenMiamMiamUserBundle:User')->findManager($object);
 
         foreach ($managers as $manager) {
             $securityIdentity = UserSecurityIdentity::fromAccount($manager);
 
-            foreach($objectAces as $index => $ace) {
+            foreach ($objectAces as $index => $ace) {
                 if ($ace->getSecurityIdentity()->equals($securityIdentity)) {
                     if (MaskBuilder::MASK_OWNER === $ace->getMask()) {
 
@@ -185,7 +202,7 @@ class UserManager
         $securityIdentity = UserSecurityIdentity::fromAccount($user);
 
         $objectAceExists = false;
-        foreach($acl->getObjectAces() as $index => $ace) {
+        foreach ($acl->getObjectAces() as $index => $ace) {
             // Look if user already in ACEs
             if ($ace->getSecurityIdentity()->equals($securityIdentity)) {
                 $objectAceExists = true;
@@ -194,10 +211,11 @@ class UserManager
                 if (MaskBuilder::MASK_OPERATOR === $ace->getMask()) {
                     $acl->updateObjectAce($securityIdentity, MaskBuilder::MASK_OWNER);
                 }
-
-            // Deletes old owner if exists
-            } else if (!$ace->getSecurityIdentity()->equals($securityIdentity) && MaskBuilder::MASK_OWNER === $ace->getMask()) {
-                $acl->deleteObjectAce($index);
+                // Deletes old owner if exists
+            } else {
+                if (!$ace->getSecurityIdentity()->equals($securityIdentity) && MaskBuilder::MASK_OWNER === $ace->getMask()) {
+                    $acl->deleteObjectAce($index);
+                }
             };
         }
 
@@ -227,11 +245,11 @@ class UserManager
         }
 
         $objectIdentity = ObjectIdentity::fromDomainObject($object);
-        $acl = $this->aclProvider->findAcl($objectIdentity);
+        $acl            = $this->aclProvider->findAcl($objectIdentity);
 
         $securityIdentity = UserSecurityIdentity::fromAccount($user);
 
-        foreach($acl->getObjectAces() as $index => $ace) {
+        foreach ($acl->getObjectAces() as $index => $ace) {
             if ($ace->getSecurityIdentity()->equals($securityIdentity)) {
                 if (MaskBuilder::MASK_OWNER === $ace->getMask()) {
 
@@ -269,7 +287,7 @@ class UserManager
         $securityIdentity = UserSecurityIdentity::fromAccount($user);
 
         $objectAceExists = false;
-        foreach($acl->getObjectAces() as $index => $ace) {
+        foreach ($acl->getObjectAces() as $index => $ace) {
             if ($ace->getSecurityIdentity()->equals($securityIdentity)) {
                 $objectAceExists = true;
             }
@@ -299,12 +317,12 @@ class UserManager
         }
 
         $objectIdentity = ObjectIdentity::fromDomainObject($object);
-        $acl = $this->aclProvider->findAcl($objectIdentity);
+        $acl            = $this->aclProvider->findAcl($objectIdentity);
 
         $securityIdentity = UserSecurityIdentity::fromAccount($user);
 
         $objectAceExists = false;
-        foreach($acl->getObjectAces() as $index => $ace) {
+        foreach ($acl->getObjectAces() as $index => $ace) {
             if ($ace->getSecurityIdentity()->equals($securityIdentity)) {
                 if (MaskBuilder::MASK_OPERATOR === $ace->getMask()) {
                     $acl->deleteObjectAce($index);
