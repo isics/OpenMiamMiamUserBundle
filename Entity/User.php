@@ -8,6 +8,7 @@ use FOS\UserBundle\Model\User as BaseUser;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Association;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Branch;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Subscription;
+use Isics\Bundle\OpenMiamMiamBundle\Model\Location;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
 
@@ -32,7 +33,7 @@ class User extends BaseUser
      * @ORM\Column(name="firstname", type="string", length=128, nullable=false)
      * @Expose
      */
-    protected $firstname;
+    private $firstname;
 
     /**
      * @var string $lastname
@@ -40,7 +41,7 @@ class User extends BaseUser
      * @ORM\Column(name="lastname", type="string", length=128, nullable=false)
      * @Expose
      */
-    protected $lastname;
+    private $lastname;
 
     /**
      * @var string $address1
@@ -48,7 +49,7 @@ class User extends BaseUser
      * @ORM\Column(name="address1", type="string", length=64, nullable=true)
      * @Expose
      */
-    protected $address1;
+    private $address1;
 
     /**
      * @var string $address2
@@ -56,7 +57,7 @@ class User extends BaseUser
      * @ORM\Column(name="address2", type="string", length=64, nullable=true)
      * @Expose
      */
-    protected $address2;
+    private $address2;
 
     /**
      * @var string $zipcode
@@ -64,7 +65,7 @@ class User extends BaseUser
      * @ORM\Column(name="zipcode", type="string", length=8, nullable=true)
      * @Expose
      */
-    protected $zipcode;
+    private $zipcode;
 
     /**
      * @var string $city
@@ -72,42 +73,49 @@ class User extends BaseUser
      * @ORM\Column(name="city", type="string", length=64, nullable=true)
      * @Expose
      */
-    protected $city;
+    private $city;
+
+    /**
+     * @ORM\Column(type="integer", nullable=false)
+     *
+     * @var int
+     */
+    private $locationStatus;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      *
      * @var float
      */
-    protected $latitude;
+    private $latitude;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      *
      * @var float
      */
-    protected $longitude;
+    private $longitude;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      *
      * @var float
      */
-    protected $sinRadLatitude;
+    private $sinRadLatitude;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      *
      * @var float
      */
-    protected $cosRadLatitude;
+    private $cosRadLatitude;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      *
      * @var float
      */
-    protected $radLongitude;
+    private $radLongitude;
 
     /**
      * @var string $phoneNumber
@@ -115,21 +123,21 @@ class User extends BaseUser
      * @ORM\Column(name="phone_number", type="string", length=16, nullable=true)
      * @Expose
      */
-    protected $phoneNumber;
+    private $phoneNumber;
 
     /**
      * @var \Doctrine\Common\Collections\Collection $salesOrders
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\SalesOrder", mappedBy="user")
      */
-    protected $salesOrders;
+    private $salesOrders;
 
     /**
      * @var Collection|Subscription[] $subscriptions
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Subscription", mappedBy="user")
      */
-    protected $subscriptions;
+    private $subscriptions;
 
     /**
      * @var boolean $isOrdersOpenNotificationSubscriber
@@ -137,7 +145,7 @@ class User extends BaseUser
      * @ORM\Column(name="is_orders_open_notification_subscriber", type="boolean", nullable=false, options={"default":0})
      * @Expose
      */
-    protected $isOrdersOpenNotificationSubscriber;
+    private $isOrdersOpenNotificationSubscriber;
 
     /**
      * @var boolean $isNewsletterSubscriber
@@ -145,56 +153,56 @@ class User extends BaseUser
      * @ORM\Column(name="is_newsletter_subscriber", type="boolean", nullable=false, options={"default":0})
      * @Expose
      */
-    protected $isNewsletterSubscriber;
+    private $isNewsletterSubscriber;
 
     /**
      * @var \Doctrine\Common\Collections\Collection $payments
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Payment", mappedBy="user")
      */
-    protected $payments;
+    private $payments;
 
     /**
      * @var \Doctrine\Common\Collections\Collection $activityLogs
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Activity", mappedBy="user")
      */
-    protected $activityLogs;
+    private $activityLogs;
 
     /**
      * @var \Doctrine\Common\Collections\Collection $comments
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Comment", mappedBy="user")
      */
-    protected $comments;
+    private $comments;
 
     /**
      * @var \Doctrine\Common\Collections\Collection $writtenComments
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Comment", mappedBy="writer")
      */
-    protected $writtenComments;
+    private $writtenComments;
 
     /**
      * @ORM\Column(name="facebook_id", type="string", length=255, nullable=true)
      *
      * @var string
      */
-    protected $facebookId;
+    private $facebookId;
 
     /**
      * @ORM\Column(name="facebook_access_token", type="string", length=255, nullable=true)
      *
      * @var string
      */
-    protected $facebookAccessToken;
+    private $facebookAccessToken;
 
     /**
      * @ORM\Column(name="facebook_refresh_token", type="string", length=255, nullable=true)
      *
      * @var string
      */
-    protected $facebookRefreshToken;
+    private $facebookRefreshToken;
 
     /**
      * @var Branch
@@ -202,14 +210,14 @@ class User extends BaseUser
      * @ORM\ManyToOne(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Branch")
      * @ORM\JoinColumn(nullable=true)
      */
-    protected $defaultBranch;
+    private $defaultBranch;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
-    protected $lastRelaunchAt;
+    private $lastRelaunchAt;
 
     /**
      * Constructor
@@ -220,6 +228,7 @@ class User extends BaseUser
 
         $this->isOrdersOpenNotificationSubscriber = false;
         $this->isNewsletterSubscriber             = false;
+        $this->locationStatus                     = Location::STATUS_PENDING;
     }
 
     /**
@@ -817,5 +826,21 @@ class User extends BaseUser
     public function getLastRelaunchAt()
     {
         return $this->lastRelaunchAt;
+    }
+
+    /**
+     * @param int $locationStatus
+     */
+    public function setLocationStatus($locationStatus)
+    {
+        $this->locationStatus = $locationStatus;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLocationStatus()
+    {
+        return $this->locationStatus;
     }
 }

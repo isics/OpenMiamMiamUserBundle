@@ -89,7 +89,7 @@ class UserManager
      *
      * @param \Doctrine\Common\Collections\Collection $branches
      *
-     * @return array Subscribers
+     * @return User[]
      */
     public function findOrdersOpenNotificationSubscribersForBranches($branches)
     {
