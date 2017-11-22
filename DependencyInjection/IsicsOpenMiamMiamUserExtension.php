@@ -34,6 +34,7 @@ class IsicsOpenMiamMiamUserExtension extends Extension
         }
 
         $container->setParameter('open_miam_miam_user.last_order_nb_days_considering_customer', $config['last_order_nb_days_considering_customer']);
+        $container->setParameter('open_miam_miam_user.nb_days_without_relaunch', $config['nb_days_without_relaunch']);
     }
 
     /**

@@ -595,4 +595,45 @@ QUERY;
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param Branch|Branch[] $branches
+     * @param int $nbDaysWithoutRelaunch
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return User[]
+     */
+    public function findAssociatedUsersForBranches($branches, $nbDaysWithoutRelaunch = null)
+    {
+        if (!is_array($branches) && !$branches instanceof \Traversable) {
+            $branches = array($branches);
+        }
+
+        $branchesIds = array();
+        foreach ($branches as $branch) {
+            if (!$branch instanceof Branch) {
+                throw new \InvalidArgumentException('$branches parameter must be a Branch instance or a Branch collection (array or iterable)');
+            }
+
+            $branchesIds[] = $branch->getId();
+        }
+
+        $qb = $this->createQueryBuilder('u')
+            ->where('u.locked = 0');
+
+        $qb->andWhere($qb->expr()->in('u.defaultBranch', $branchesIds));
+
+        if (null !== $nbDaysWithoutRelaunch) {
+            $beforeDate = new \DateTime("- $nbDaysWithoutRelaunch days");
+
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->isNull('u.lastRelaunchAt'),
+                'u.lastRelaunchAt < :beforeDate'
+            ));
+            $qb->setParameter('beforeDate', $beforeDate);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

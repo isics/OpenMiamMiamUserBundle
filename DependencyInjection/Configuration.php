@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('last_order_nb_days_considering_customer')->defaultValue('60')->end()
+                ->scalarNode('nb_days_without_relaunch')->defaultValue('180')->end()
             ->end();
 
         return $treeBuilder;

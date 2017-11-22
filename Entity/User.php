@@ -2,10 +2,13 @@
 
 namespace Isics\Bundle\OpenMiamMiamUserBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Association;
+use Isics\Bundle\OpenMiamMiamBundle\Entity\Branch;
 use Isics\Bundle\OpenMiamMiamBundle\Entity\Subscription;
+use Isics\Bundle\OpenMiamMiamBundle\Model\Location;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
 
@@ -73,6 +76,48 @@ class User extends BaseUser
     private $city;
 
     /**
+     * @ORM\Column(type="integer", nullable=false)
+     *
+     * @var int
+     */
+    private $locationStatus;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     *
+     * @var float
+     */
+    private $latitude;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     *
+     * @var float
+     */
+    private $longitude;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     *
+     * @var float
+     */
+    private $sinRadLatitude;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     *
+     * @var float
+     */
+    private $cosRadLatitude;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     *
+     * @var float
+     */
+    private $radLongitude;
+
+    /**
      * @var string $phoneNumber
      *
      * @ORM\Column(name="phone_number", type="string", length=16, nullable=true)
@@ -88,7 +133,7 @@ class User extends BaseUser
     private $salesOrders;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection $subscriptions
+     * @var Collection|Subscription[] $subscriptions
      *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Subscription", mappedBy="user")
      */
@@ -133,7 +178,7 @@ class User extends BaseUser
 
     /**
      * @var \Doctrine\Common\Collections\Collection $writtenComments
-     * 
+     *
      * @ORM\OneToMany(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Comment", mappedBy="writer")
      */
     private $writtenComments;
@@ -160,6 +205,21 @@ class User extends BaseUser
     private $facebookRefreshToken;
 
     /**
+     * @var Branch
+     *
+     * @ORM\ManyToOne(targetEntity="Isics\Bundle\OpenMiamMiamBundle\Entity\Branch")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $defaultBranch;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastRelaunchAt;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -167,7 +227,8 @@ class User extends BaseUser
         parent::__construct();
 
         $this->isOrdersOpenNotificationSubscriber = false;
-        $this->isNewsletterSubscriber = false;
+        $this->isNewsletterSubscriber             = false;
+        $this->locationStatus                     = Location::STATUS_PENDING;
     }
 
     /**
@@ -234,6 +295,7 @@ class User extends BaseUser
      * Set phoneNumber
      *
      * @param string $phoneNumber
+     *
      * @return User
      */
     public function setPhoneNumber($phoneNumber)
@@ -387,7 +449,7 @@ class User extends BaseUser
     public function setEmail($email)
     {
         parent::setEmail($email);
-        $this->username = $email;
+        $this->username          = $email;
         $this->usernameCanonical = $email;
     }
 
@@ -421,6 +483,7 @@ class User extends BaseUser
      * Add salesOrders
      *
      * @param \Isics\Bundle\OpenMiamMiamBundle\Entity\SalesOrder $salesOrders
+     *
      * @return User
      */
     public function addSalesOrder(\Isics\Bundle\OpenMiamMiamBundle\Entity\SalesOrder $salesOrders)
@@ -444,6 +507,7 @@ class User extends BaseUser
      * Add subscriptions
      *
      * @param \Isics\Bundle\OpenMiamMiamBundle\Entity\Subscription $subscriptions
+     *
      * @return User
      */
     public function addSubscription(\Isics\Bundle\OpenMiamMiamBundle\Entity\Subscription $subscriptions)
@@ -467,6 +531,7 @@ class User extends BaseUser
      * Add payments
      *
      * @param \Isics\Bundle\OpenMiamMiamBundle\Entity\Payment $payments
+     *
      * @return User
      */
     public function addPayment(\Isics\Bundle\OpenMiamMiamBundle\Entity\Payment $payments)
@@ -500,6 +565,7 @@ class User extends BaseUser
      * Add activityLogs
      *
      * @param \Isics\Bundle\OpenMiamMiamBundle\Entity\Activity $activityLogs
+     *
      * @return User
      */
     public function addActivityLog(\Isics\Bundle\OpenMiamMiamBundle\Entity\Activity $activityLogs)
@@ -533,12 +599,13 @@ class User extends BaseUser
      * Add comments
      *
      * @param \Isics\Bundle\OpenMiamMiamBundle\Entity\Comment $comments
+     *
      * @return User
      */
     public function addComment(\Isics\Bundle\OpenMiamMiamBundle\Entity\Comment $comments)
     {
         $this->comments[] = $comments;
-    
+
         return $this;
     }
 
@@ -555,7 +622,7 @@ class User extends BaseUser
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getComments()
     {
@@ -566,12 +633,13 @@ class User extends BaseUser
      * Add writtenComments
      *
      * @param \Isics\Bundle\OpenMiamMiamBundle\Entity\Comment $writtenComments
+     *
      * @return User
      */
     public function addWrittenComment(\Isics\Bundle\OpenMiamMiamBundle\Entity\Comment $writtenComments)
     {
         $this->writtenComments[] = $writtenComments;
-    
+
         return $this;
     }
 
@@ -588,7 +656,7 @@ class User extends BaseUser
     /**
      * Get writtenComments
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getWrittenComments()
     {
@@ -641,5 +709,138 @@ class User extends BaseUser
     public function getFacebookRefreshToken()
     {
         return $this->facebookRefreshToken;
+    }
+
+    /**
+     * @param float $cosRadLatitude
+     */
+    public function setCosRadLatitude($cosRadLatitude)
+    {
+        $this->cosRadLatitude = $cosRadLatitude;
+    }
+
+    /**
+     * @return float
+     */
+    public function getCosRadLatitude()
+    {
+        return $this->cosRadLatitude;
+    }
+
+    /**
+     * @param float $latitude
+     */
+    public function setLatitude($latitude)
+    {
+        $this->latitude = $latitude;
+
+        $this->setSinRadLatitude(sin(deg2rad($latitude)));
+        $this->setCosRadLatitude(cos(deg2rad($latitude)));
+    }
+
+    /**
+     * @return float
+     */
+    public function getLatitude()
+    {
+        return $this->latitude;
+    }
+
+    /**
+     * @param float $longitude
+     */
+    public function setLongitude($longitude)
+    {
+        $this->longitude = $longitude;
+
+        $this->setRadLongitude(deg2rad($longitude));
+    }
+
+    /**
+     * @return float
+     */
+    public function getLongitude()
+    {
+        return $this->longitude;
+    }
+
+    /**
+     * @param float $radLongitude
+     */
+    public function setRadLongitude($radLongitude)
+    {
+        $this->radLongitude = $radLongitude;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRadLongitude()
+    {
+        return $this->radLongitude;
+    }
+
+    /**
+     * @param float $sinRadLatitude
+     */
+    public function setSinRadLatitude($sinRadLatitude)
+    {
+        $this->sinRadLatitude = $sinRadLatitude;
+    }
+
+    /**
+     * @return float
+     */
+    public function getSinRadLatitude()
+    {
+        return $this->sinRadLatitude;
+    }
+
+    /**
+     * @param Branch $defaultBranch
+     */
+    public function setDefaultBranch(Branch $defaultBranch = null)
+    {
+        $this->defaultBranch = $defaultBranch;
+    }
+
+    /**
+     * @return Branch
+     */
+    public function getDefaultBranch()
+    {
+        return $this->defaultBranch;
+    }
+
+    /**
+     * @param \DateTime $lastRelaunchAt
+     */
+    public function setLastRelaunchAt(\DateTime $lastRelaunchAt = null)
+    {
+        $this->lastRelaunchAt = $lastRelaunchAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getLastRelaunchAt()
+    {
+        return $this->lastRelaunchAt;
+    }
+
+    /**
+     * @param int $locationStatus
+     */
+    public function setLocationStatus($locationStatus)
+    {
+        $this->locationStatus = $locationStatus;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLocationStatus()
+    {
+        return $this->locationStatus;
     }
 }
