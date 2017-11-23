@@ -621,6 +621,7 @@ QUERY;
 
         $qb = $this->createQueryBuilder('u')
             ->where('u.locked = 0')
+            ->andWhere('u.enabled = 1')
             ->andWhere('u.isOrdersOpenNotificationSubscriber = true');
 
         $qb->andWhere($qb->expr()->in('u.defaultBranch', $branchesIds));
